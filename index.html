@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SQL Operators Quiz</title>
+
+<style>
+body{
+  font-family: Arial;
+  text-align:center;
+  background:#f2f2f2;
+}
+
+.quiz-box{
+  width:60%;
+  margin:auto;
+  background:white;
+  padding:20px;
+  margin-top:40px;
+  border-radius:10px;
+  box-shadow:0 0 10px gray;
+}
+
+button{
+  padding:10px 20px;
+  margin:10px;
+  cursor:pointer;
+}
+
+#timer{
+  font-size:20px;
+  color:red;
+}
+</style>
+</head>
+
+<body>
+
+<div class="quiz-box">
+
+<h2>Practical No.4 — SQL Operators Quiz</h2>
+
+<input id="prn" placeholder="Enter PRN"><br><br>
+<input id="name" placeholder="Enter Student Name"><br><br>
+
+<div id="quiz"></div>
+
+<h3 id="timer"></h3>
+<h3 id="result"></h3>
+
+</div>
+
+<script>
+
+// 🔗 PASTE YOUR GOOGLE SCRIPT URL HERE
+const scriptURL = "https://script.google.com/macros/s/AKfycbwvfeoavRfMZRsPDkUoXU6macJSdmi7ktRbMauNCF843KirBnn5GGDoWtd_6qOl5Drm/exec";
+
+const questions = [
+
+{
+q:"SQL BETWEEN is inclusive?",
+options:["Yes","No","Only start","Only end"],
+answer:0
+},
+
+{
+q:"NOT operator does what?",
+options:["Combine","Negate","Compare","Sort"],
+answer:1
+},
+
+{
+q:"IN operator replaces?",
+options:["AND","OR","JOIN","LIKE"],
+answer:1
+},
+
+{
+q:"LIKE is used for?",
+options:["Math","Pattern search","Join","Sort"],
+answer:1
+},
+
+{
+q:"Wildcard for multiple chars?",
+options:["%","_","-","[]"],
+answer:0
+},
+
+{
+q:"AND operator requires?",
+options:["All true","One true","None","Random"],
+answer:0
+},
+
+{
+q:"OR operator requires?",
+options:["All","One","None","Two"],
+answer:1
+},
+
+{
+q:"NOT BETWEEN means?",
+options:["Inside","Outside","Equal","Null"],
+answer:1
+},
+
+{
+q:"LIKE default sensitivity?",
+options:["Case sensitive","Case insensitive","Numeric","Binary"],
+answer:1
+},
+
+{
+q:"AND precedence over OR?",
+options:["Yes","No","Equal","Random"],
+answer:0
+}
+
+];
+
+let index=0;
+let score=0;
+let time=20;
+let timer;
+
+function loadQuestion(){
+
+if(index>=questions.length){
+finishQuiz();
+return;
+}
+
+time=20;
+document.getElementById("timer").innerText="Time: "+time;
+
+timer=setInterval(()=>{
+time--;
+document.getElementById("timer").innerText="Time: "+time;
+
+if(time==0){
+clearInterval(timer);
+index++;
+loadQuestion();
+}
+},1000);
+
+let q=questions[index];
+
+let html=`<h3>Q${index+1}. ${q.q}</h3>`;
+
+q.options.forEach((opt,i)=>{
+html+=`<button onclick="selectAnswer(${i})">${opt}</button><br>`;
+});
+
+document.getElementById("quiz").innerHTML=html;
+}
+
+function selectAnswer(i){
+
+clearInterval(timer);
+
+let correct=questions[index].answer;
+
+if(i==correct){
+score++;
+document.getElementById("result").innerHTML="✅ Correct";
+}else{
+document.getElementById("result").innerHTML="❌ Wrong";
+}
+
+setTimeout(()=>{
+document.getElementById("result").innerHTML="";
+index++;
+loadQuestion();
+},1500);
+
+}
+
+function finishQuiz(){
+
+document.getElementById("quiz").innerHTML=
+`<h2>Final Score: ${score}/10</h2>`;
+
+sendResult();
+}
+
+function sendResult(){
+
+let data={
+prn:document.getElementById("prn").value,
+name:document.getElementById("name").value,
+score:score
+};
+
+fetch(scriptURL,{
+method:"POST",
+body:JSON.stringify(data)
+})
+.then(res=>alert("Result Submitted to Sheet"));
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
